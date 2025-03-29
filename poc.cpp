@@ -7,7 +7,7 @@ import vee;
 import voo;
 import vapp;
 
-static constexpr const auto max_vertices = 12;
+static constexpr const auto max_vertices = 256;
 
 struct vtx {
   dotz::vec3 pos;
@@ -16,13 +16,17 @@ struct vtx {
 static unsigned g_count {};
 static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  m += { .pos { 5, +5, +5 } };
-  m += { .pos { 5, -5, +5 } };
-  m += { .pos { 5, -5, -5 } };
+  for (auto i = 0; i < 5; i++) {
+    float s = i - 5;
+    float e = s + 4;
+    m += { .pos { e, e, -20.f + i } };
+    m += { .pos { s, e, -20.f + i } };
+    m += { .pos { s, s, -20.f + i } };
 
-  m += { .pos { 5, +5, +5 } };
-  m += { .pos { 5, -5, -5 } };
-  m += { .pos { 5, +5, -5 } };
+    m += { .pos { e, e, -20.f + i } };
+    m += { .pos { s, s, -20.f + i } };
+    m += { .pos { e, s, -20.f + i } };
+  }
 }
 
 struct app : public vapp {
