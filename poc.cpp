@@ -57,7 +57,12 @@ struct app : public vapp {
       // TODO: setup multiple subpasses
 
       auto dsl = vee::create_descriptor_set_layout({
-        vee::dsl_fragment_sampler(6),
+        vee::dsl_fragment_sampler(),
+        vee::dsl_fragment_sampler(),
+        vee::dsl_fragment_sampler(),
+        vee::dsl_fragment_sampler(),
+        vee::dsl_fragment_sampler(),
+        vee::dsl_fragment_sampler(),
       });
       auto pl = vee::create_pipeline_layout({ *dsl });
       auto gp = vee::create_graphics_pipeline({
@@ -76,10 +81,17 @@ struct app : public vapp {
         },
       });
 
+      auto smp = vee::create_sampler(vee::linear_sampler);
       auto dpool = vee::create_descriptor_pool(1, {
         vee::combined_image_sampler(6)
       });
       auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
+      vee::update_descriptor_set(dset, 0, img_occ.iv(), *smp);
+      vee::update_descriptor_set(dset, 1, img_clr.iv(), *smp);
+      vee::update_descriptor_set(dset, 2, img_dsp.iv(), *smp);
+      vee::update_descriptor_set(dset, 3, img_ndx.iv(), *smp);
+      vee::update_descriptor_set(dset, 4, img_ngl.iv(), *smp);
+      vee::update_descriptor_set(dset, 5, img_rgh.iv(), *smp);
 
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
