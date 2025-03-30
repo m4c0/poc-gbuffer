@@ -41,6 +41,13 @@ struct app : public vapp {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
       map_buf(buf);
 
+      auto img_occ = load_image("PavingStones138_1K-JPG_AmbientOcclusion.jpg");
+      auto img_clr = load_image("PavingStones138_1K-JPG_Color.jpg");
+      auto img_dsp = load_image("PavingStones138_1K-JPG_Displacement.jpg");
+      auto img_ndx = load_image("PavingStones138_1K-JPG_NormalDX.jpg");
+      auto img_ngl = load_image("PavingStones138_1K-JPG_NormalGL.jpg");
+      auto img_rgh = load_image("PavingStones138_1K-JPG_Roughness.jpg");
+
       // TODO: setup multiple outputs
       // TODO: setup multiple subpasses
 
