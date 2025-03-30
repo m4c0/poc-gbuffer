@@ -1,6 +1,12 @@
 #pragma leco app
 #pragma leco add_shader "poc.vert"
 #pragma leco add_shader "poc.frag"
+#pragma leco add_resource "PavingStones138_1K-JPG_AmbientOcclusion.jpg"
+#pragma leco add_resource "PavingStones138_1K-JPG_Color.jpg"
+#pragma leco add_resource "PavingStones138_1K-JPG_Displacement.jpg"
+#pragma leco add_resource "PavingStones138_1K-JPG_NormalDX.jpg"
+#pragma leco add_resource "PavingStones138_1K-JPG_NormalGL.jpg"
+#pragma leco add_resource "PavingStones138_1K-JPG_Roughness.jpg"
 
 import dotz;
 import vee;
