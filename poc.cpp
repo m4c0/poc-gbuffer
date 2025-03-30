@@ -35,6 +35,9 @@ struct app : public vapp {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
       map_buf(buf);
 
+      // TODO: setup multiple outputs
+      // TODO: setup multiple subpasses
+
       auto pl = vee::create_pipeline_layout();
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
