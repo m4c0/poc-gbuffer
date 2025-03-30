@@ -9,6 +9,7 @@
 #pragma leco add_resource "PavingStones138_1K-JPG_Roughness.jpg"
 
 import dotz;
+import jute;
 import vee;
 import voo;
 import vapp;
@@ -40,6 +41,10 @@ struct app : public vapp {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
       map_buf(buf);
+
+      const auto load_image = [&](jute::view name) {
+        return voo::load_sires_image(name, dq.physical_device());
+      };
 
       auto img_occ = load_image("PavingStones138_1K-JPG_AmbientOcclusion.jpg");
       auto img_clr = load_image("PavingStones138_1K-JPG_Color.jpg");
