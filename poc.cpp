@@ -56,7 +56,10 @@ struct app : public vapp {
       // TODO: setup multiple outputs
       // TODO: setup multiple subpasses
 
-      auto pl = vee::create_pipeline_layout();
+      auto dsl = vee::create_descriptor_set_layout({
+        vee::dsl_fragment_sampler(6),
+      });
+      auto pl = vee::create_pipeline_layout({ *dsl });
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
@@ -73,6 +76,11 @@ struct app : public vapp {
         },
       });
 
+      auto dpool = vee::create_descriptor_pool(1, {
+        vee::combined_image_sampler(6)
+      });
+      auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
+
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           buf.setup_copy(*pcb);
@@ -84,6 +92,7 @@ struct app : public vapp {
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, buf.local_buffer());
+          vee::cmd_bind_descriptor_set(*pcb, *pl, 0, dset);
           vee::cmd_bind_gr_pipeline(*pcb, *gp);
           vee::cmd_draw(*pcb, g_count);
         });
