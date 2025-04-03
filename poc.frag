@@ -12,5 +12,5 @@ layout(location = 0) in vec2 f_uv;
 layout(location = 0) out vec4 colour;
 
 void main() {
-  colour = vec4(texture(occ, f_uv).rgb, 1.0);
+  colour = vec4(texture(clr, f_uv).rgb, 1.0);
 }

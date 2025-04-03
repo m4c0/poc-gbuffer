@@ -25,16 +25,17 @@ struct vtx {
 static unsigned g_count {};
 static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
+  float dist = -10.f;
   for (auto i = 0; i < 5; i++) {
     float s = i - 5;
     float e = s + 4;
-    m += { .pos { e, e, -20.f + i }, .uv { 1, 1 } };
-    m += { .pos { s, e, -20.f + i }, .uv { 0, 1 } };
-    m += { .pos { s, s, -20.f + i }, .uv { 0, 0 } };
+    m += { .pos { e, e, dist + i }, .uv { 1, 1 } };
+    m += { .pos { s, e, dist + i }, .uv { 0, 1 } };
+    m += { .pos { s, s, dist + i }, .uv { 0, 0 } };
 
-    m += { .pos { e, e, -20.f + i }, .uv { 1, 1 } };
-    m += { .pos { s, s, -20.f + i }, .uv { 0, 0 } };
-    m += { .pos { e, s, -20.f + i }, .uv { 1, 0 } };
+    m += { .pos { e, e, dist + i }, .uv { 1, 1 } };
+    m += { .pos { s, s, dist + i }, .uv { 0, 0 } };
+    m += { .pos { e, s, dist + i }, .uv { 1, 0 } };
   }
 }
 
