@@ -7,7 +7,7 @@
 #pragma leco add_resource "PavingStones138_1K-JPG_NormalDX.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_NormalGL.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Roughness.jpg"
-#pragma leco add_resource "../wavefront/model.obj"
+#pragma leco add_resource "model.obj"
 
 import dotz;
 import jute;

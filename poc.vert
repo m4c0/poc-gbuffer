@@ -22,7 +22,7 @@ const mat4 proj = mat4(
 );
 
 void main() {
-  gl_Position = vec4(pos.x, -pos.y + 0.03, pos.z - 0.1, 1) * proj;
+  gl_Position = vec4(pos.x, -pos.y + 0.25, pos.z - 2, 1) * proj;
   f_uv = uv;
 }
 
