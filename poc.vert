@@ -9,8 +9,8 @@ const float fov_rad = radians(90);
 const float aspect = 1;
 
 const float f = 1 / atan(fov_rad / 2);
-const float far = 100.0;
-const float near = 0.1;
+const float far = 10.0;
+const float near = 0.001;
 
 const float p22 = (far + near) / (near - far);
 const float p32 = (2.0 * far * near) / (near - far);
@@ -22,7 +22,7 @@ const mat4 proj = mat4(
 );
 
 void main() {
-  gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * proj;
+  gl_Position = vec4(pos.x, -pos.y + 0.03, pos.z - 0.1, 1) * proj;
   f_uv = uv;
 }
 

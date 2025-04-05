@@ -7,43 +7,23 @@
 #pragma leco add_resource "PavingStones138_1K-JPG_NormalDX.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_NormalGL.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Roughness.jpg"
+#pragma leco add_resource "../wavefront/model.obj"
 
 import dotz;
 import jute;
+import sires;
 import traits;
 import vee;
 import voo;
 import vapp;
+import wavefront;
 
-static constexpr const auto max_vertices = 256;
-
-struct vtx {
-  dotz::vec3 pos;
-  dotz::vec2 uv;
-};
-
-static unsigned g_count {};
-static void map_buf(voo::h2l_buffer & buf) {
-  voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  float dist = -10.f;
-  for (auto i = 0; i < 5; i++) {
-    float s = i - 5;
-    float e = s + 4;
-    m += { .pos { e, e, dist + i }, .uv { 1, 1 } };
-    m += { .pos { s, e, dist + i }, .uv { 0, 1 } };
-    m += { .pos { s, s, dist + i }, .uv { 0, 0 } };
-
-    m += { .pos { e, e, dist + i }, .uv { 1, 1 } };
-    m += { .pos { s, s, dist + i }, .uv { 0, 0 } };
-    m += { .pos { e, s, dist + i }, .uv { 1, 0 } };
-  }
-}
+using wavefront::vtx;
 
 struct app : public vapp {
   void run() override {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
-      map_buf(buf);
+      auto [vbuf, vcount] = wavefront::load_model(dq.physical_device(), sires::real_path_name("model.obj"));
 
       const auto load_image = [&](jute::view name) {
         return voo::load_sires_image(name, dq.physical_device());
@@ -81,7 +61,7 @@ struct app : public vapp {
         },
         .attributes {
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
-          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),
+          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::txt)),
         },
       });
 
@@ -101,7 +81,7 @@ struct app : public vapp {
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           if (!loaded) {
-            buf.setup_copy(*pcb);
+            vbuf.setup_copy(*pcb);
             img_occ.setup_copy(*pcb);
             img_clr.setup_copy(*pcb);
             img_dsp.setup_copy(*pcb);
@@ -116,10 +96,10 @@ struct app : public vapp {
           });
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
-          vee::cmd_bind_vertex_buffers(*pcb, 0, buf.local_buffer());
+          vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
           vee::cmd_bind_descriptor_set(*pcb, *pl, 0, dset);
           vee::cmd_bind_gr_pipeline(*pcb, *gp);
-          vee::cmd_draw(*pcb, g_count);
+          vee::cmd_draw(*pcb, vcount);
         });
       });
     });
