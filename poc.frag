@@ -8,6 +8,7 @@ layout(set = 0, binding = 4) uniform sampler2D ngl;
 layout(set = 0, binding = 5) uniform sampler2D rgh;
 
 layout(location = 0) in vec2 f_uv;
+layout(location = 1) in vec3 f_nrm;
 
 layout(location = 0) out vec4 colour;
 

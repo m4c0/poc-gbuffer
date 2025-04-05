@@ -62,6 +62,7 @@ struct app : public vapp {
         .attributes {
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
           vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::txt)),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
         },
       });
 

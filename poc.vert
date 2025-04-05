@@ -2,8 +2,10 @@
 
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 uv;
+layout(location = 2) in vec3 nrm;
 
 layout(location = 0) out vec2 f_uv;
+layout(location = 1) out vec3 f_nrm;
 
 const float fov_rad = radians(90);
 const float aspect = 1;
@@ -24,5 +26,6 @@ const mat4 proj = mat4(
 void main() {
   gl_Position = vec4(pos.x, -pos.y + 0.25, pos.z - 2, 1) * proj;
   f_uv = uv;
+  f_nrm = nrm;
 }
 
