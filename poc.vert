@@ -9,8 +9,9 @@ layout(location = 1) in vec2 uv;
 layout(location = 2) in vec3 nrm;
 
 layout(location = 0) out struct {
-  vec2 uv;
+  vec3 pos;
   vec3 nrm;
+  vec2 uv;
 } f;
 
 const float fov_rad = radians(90);
@@ -45,7 +46,8 @@ void main() {
   );
   mat4 model = model_r * model_t;
   gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
-  f.uv = uv;
+  f.pos = pos;
   f.nrm = nrm;
+  f.uv = uv;
 }
 

@@ -54,7 +54,7 @@ struct app : public vapp {
       auto pl = vee::create_pipeline_layout({
         *dsl,
       }, {
-        vee::vertex_push_constant_range<upc>(),
+        vee::vert_frag_push_constant_range<upc>(),
       });
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
@@ -86,7 +86,7 @@ struct app : public vapp {
       vee::update_descriptor_set(dset, 4, img_ngl.iv(), *smp);
       vee::update_descriptor_set(dset, 5, img_rgh.iv(), *smp);
 
-      upc pc {};
+      upc pc { { 1, 1, 5 } };
       bool loaded = false;
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
@@ -107,7 +107,7 @@ struct app : public vapp {
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
-          vee::cmd_push_vertex_constants(*pcb, *pl, &pc);
+          vee::cmd_push_vert_frag_constants(*pcb, *pl, &pc);
           vee::cmd_bind_descriptor_set(*pcb, *pl, 0, dset);
           vee::cmd_bind_gr_pipeline(*pcb, *gp);
           vee::cmd_draw(*pcb, vcount);
