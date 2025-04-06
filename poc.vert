@@ -7,6 +7,8 @@ layout(push_constant) uniform upc {
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 uv;
 layout(location = 2) in vec3 nrm;
+layout(location = 3) in vec3 tgt;
+layout(location = 4) in vec3 btgt;
 
 layout(location = 0) out struct {
   vec3 pos;
