@@ -20,6 +20,10 @@ import wavefront;
 
 using wavefront::vtx;
 
+struct upc {
+  dotz::vec3 norm;
+};
+
 struct app : public vapp {
   void run() override {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
@@ -47,7 +51,11 @@ struct app : public vapp {
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(),
       });
-      auto pl = vee::create_pipeline_layout({ *dsl });
+      auto pl = vee::create_pipeline_layout({
+        *dsl,
+      }, {
+        vee::vertex_push_constant_range<upc>(),
+      });
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
@@ -78,6 +86,7 @@ struct app : public vapp {
       vee::update_descriptor_set(dset, 4, img_ngl.iv(), *smp);
       vee::update_descriptor_set(dset, 5, img_rgh.iv(), *smp);
 
+      upc pc {};
       bool loaded = false;
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
@@ -98,6 +107,7 @@ struct app : public vapp {
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
+          vee::cmd_push_vertex_constants(*pcb, *pl, &pc);
           vee::cmd_bind_descriptor_set(*pcb, *pl, 0, dset);
           vee::cmd_bind_gr_pipeline(*pcb, *gp);
           vee::cmd_draw(*pcb, vcount);
