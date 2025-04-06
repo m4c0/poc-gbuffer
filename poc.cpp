@@ -41,15 +41,15 @@ struct app : public vapp {
         for (auto i = 0; i < vcount; i += 3) {
           for (auto j = 0; j < 3; j++) {
             auto k = i + j;
-            auto k1 = k + (j + 1) % 3;
-            auto k2 = k + (j + 2) % 3;
+            auto k1 = i + (j + 1) % 3;
+            auto k2 = i + (j + 2) % 3;
             auto e1 = v[k1].pos - v[k].pos;
             auto e2 = v[k2].pos - v[k].pos;
             auto u1 = v[k1].txt - v[k].txt;
             auto u2 = v[k2].txt - v[k].txt;
             float f = u1.x * u2.y - u1.y * u2.x;
             m[k].tgt  = (u2.y * e1 - u1.y * e2) / f;
-            m[k].btgt = (u2.x * e1 - u1.x * e2) / f;
+            m[k].btgt = (-u2.x * e1 + u1.x * e2) / f;
           }
         }
       }

@@ -10,12 +10,9 @@ layout(location = 2) in vec3 nrm;
 layout(location = 3) in vec3 tgt;
 layout(location = 4) in vec3 btgt;
 
-layout(location = 0) out struct {
-  vec3 pos;
-  vec3 nrm;
-  vec2 uv;
-  mat3 tbn;
-} f;
+layout(location = 0) out vec3 f_pos;
+layout(location = 1) out vec2 f_uv;
+layout(location = 2) out mat3 f_tbn;
 
 const float fov_rad = radians(90);
 const float aspect = 1;
@@ -50,13 +47,12 @@ void main() {
   mat4 model = model_r * model_t;
 
   gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
-  f.pos = pos;
-  f.nrm = nrm;
-  f.uv = uv;
-  f.tbn = mat3(
-    normalize(vec3(vec4(tgt,  0.0) * model)),
-    normalize(vec3(vec4(btgt, 0.0) * model)),
-    normalize(vec3(vec4(nrm,  0.0) * model))
+  f_pos = pos;
+  f_uv = uv;
+  f_tbn = mat3(
+    normalize(vec3(model * vec4(tgt,  0.0))),
+    normalize(vec3(model * vec4(btgt, 0.0))),
+    normalize(vec3(model * vec4(nrm,  0.0)))
   );
 }
 
