@@ -15,6 +15,7 @@ layout(location = 0) in struct {
   vec3 pos;
   vec3 nrm;
   vec2 uv;
+  mat3 tbn;
 } f;
 
 layout(location = 0) out vec4 colour;

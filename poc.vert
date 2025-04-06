@@ -14,6 +14,7 @@ layout(location = 0) out struct {
   vec3 pos;
   vec3 nrm;
   vec2 uv;
+  mat3 tbn;
 } f;
 
 const float fov_rad = radians(90);
@@ -47,9 +48,15 @@ void main() {
     0, 0, 0, 1
   );
   mat4 model = model_r * model_t;
+
   gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
   f.pos = pos;
   f.nrm = nrm;
   f.uv = uv;
+  f.tbn = mat3(
+    normalize(vec3(vec4(tgt,  0.0) * model)),
+    normalize(vec3(vec4(btgt, 0.0) * model)),
+    normalize(vec3(vec4(nrm,  0.0) * model))
+  );
 }
 
