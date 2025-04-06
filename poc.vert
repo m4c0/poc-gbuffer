@@ -30,7 +30,21 @@ const mat4 proj = mat4(
 );
 
 void main() {
-  gl_Position = vec4(pos.x, -pos.y + 0.25, pos.z - 2, 1) * proj;
+  float a = radians(-45);
+  mat4 model_t = mat4(
+    1, 0, 0, 0,
+    0, 1, 0, 0.25,
+    0, 0, 1, -2,
+    0, 0, 0, 1
+  );
+  mat4 model_r = mat4(
+    1, 0, 0, 0,
+    0, cos(a), -sin(a), 0,
+    0, sin(a), cos(a), 0,
+    0, 0, 0, 1
+  );
+  mat4 model = model_r * model_t;
+  gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
   f.uv = uv;
   f.nrm = nrm;
 }
