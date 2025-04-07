@@ -25,8 +25,8 @@ struct upc {
 };
 
 struct btn {
-  dotz::vec3 btgt;
   dotz::vec3 tgt;
+  dotz::vec3 btgt;
 };
 
 struct app : public vapp {
@@ -39,18 +39,16 @@ struct app : public vapp {
         voo::memiter<vtx> v { vbuf.host_memory(), nullptr };
         voo::memiter<btn> m { btn_buf.host_memory(), nullptr };
         for (auto i = 0; i < vcount; i += 3) {
-          for (auto j = 0; j < 3; j++) {
-            auto k = i + j;
-            auto k1 = i + (j + 1) % 3;
-            auto k2 = i + (j + 2) % 3;
-            auto e1 = v[k1].pos - v[k].pos;
-            auto e2 = v[k2].pos - v[k].pos;
-            auto u1 = v[k1].txt - v[k].txt;
-            auto u2 = v[k2].txt - v[k].txt;
-            float f = u1.x * u2.y - u1.y * u2.x;
-            m[k].tgt  = (u2.y * e1 - u1.y * e2) / f;
-            m[k].btgt = (-u2.x * e1 + u1.x * e2) / f;
-          }
+          auto e1 = v[i + 1].pos - v[i].pos;
+          auto e2 = v[i + 2].pos - v[i].pos;
+          auto u1 = v[i + 1].txt - v[i].txt;
+          auto u2 = v[i + 2].txt - v[i].txt;
+          float f = u1.x * u2.y - u1.y * u2.x;
+          btn b {
+            .tgt  = (u2.y * e1 - u1.y * e2) / f,
+            .btgt = (u1.x * e2 - u2.x * e1) / f,
+          };
+          for (auto j = 0; j < 3; j++) m += b;
         }
       }
 
