@@ -1,4 +1,6 @@
 #version 450
+#extension GL_GOOGLE_include_directive : require
+#include "../glslinc/3d.glsl"
 
 layout(push_constant) uniform upc {
   vec3 light;
@@ -15,22 +17,10 @@ layout(location = 1) out vec2 f_uv;
 layout(location = 2) out mat3 f_tbn;
 
 const float fov_rad = radians(90);
-const float aspect = 1;
-
-const float fp = 1 / atan(fov_rad / 2);
-const float far = 10.0;
-const float near = 0.001;
-
-const float p22 = (far + near) / (near - far);
-const float p32 = (2.0 * far * near) / (near - far);
-const mat4 proj = mat4(
-  fp / aspect, 0.0, 0.0, 0.0,
-  0.0, fp, 0.0, 0.0,
-  0.0, 0.0, p22, p32,
-  0.0, 0.0, -1, 0.0
-);
 
 void main() {
+  mat4 proj = projection_matrix(fov_rad, 1, 0.001, 10.0);
+
   float a = radians(-45);
   mat4 model_t = mat4(
     1, 0, 0, 0,
