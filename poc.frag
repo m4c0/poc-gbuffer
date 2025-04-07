@@ -19,11 +19,8 @@ layout(location = 0) out vec4 colour;
 
 void main() {
   vec3 n = texture(ngl, f_uv).rgb * 2.0 - 1.0;
-  n = normalize(f_tbn * n);
-  vec3 l = normalize(light - f_pos);
-  vec3 dif = vec3(1) * dot(n, l);
+  vec3 l = normalize(light - f_pos) * f_tbn;
+  vec3 dif = vec3(1) * clamp(dot(n, l), 0, 1);
  
   colour = vec4(dif, 1.0);
-  //colour = vec4(n * 0.5 + 0.5, 1.0);
-  //colour = vec4(texture(clr, f.uv).rgb, 1.0);
 }

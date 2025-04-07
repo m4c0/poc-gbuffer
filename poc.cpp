@@ -45,8 +45,8 @@ struct app : public vapp {
           auto u2 = v[i + 2].txt - v[i].txt;
           float f = u1.x * u2.y - u1.y * u2.x;
           btn b {
-            .tgt  = (u2.y * e1 - u1.y * e2) / f,
-            .btgt = (u1.x * e2 - u2.x * e1) / f,
+            .tgt  = dotz::normalise((u2.y * e1 - u1.y * e2) / f),
+            .btgt = dotz::normalise((u1.x * e2 - u2.x * e1) / f),
           };
           for (auto j = 0; j < 3; j++) m += b;
         }
@@ -112,7 +112,7 @@ struct app : public vapp {
       vee::update_descriptor_set(dset, 4, img_ngl.iv(), *smp);
       vee::update_descriptor_set(dset, 5, img_rgh.iv(), *smp);
 
-      upc pc { { 1, 1, 5 } };
+      upc pc { { 5, 5, 5 } };
       bool loaded = false;
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {

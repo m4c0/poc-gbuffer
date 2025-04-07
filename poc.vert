@@ -49,10 +49,7 @@ void main() {
   gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
   f_pos = pos;
   f_uv = uv;
-  f_tbn = mat3(
-    normalize(vec3(model * vec4(tgt,  0.0))),
-    normalize(vec3(model * vec4(btgt, 0.0))),
-    normalize(vec3(model * vec4(nrm,  0.0)))
-  );
+  // Object-to-tangent
+  f_tbn = mat3(tgt, btgt, nrm);
 }
 
