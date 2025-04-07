@@ -12,6 +12,7 @@
 import dotz;
 import jute;
 import sires;
+import sitime;
 import traits;
 import vee;
 import voo;
@@ -21,7 +22,9 @@ import wavefront;
 using wavefront::vtx;
 
 struct upc {
-  dotz::vec3 norm;
+  dotz::vec3 light;
+  float aspect;
+  float time;
 };
 
 struct btn {
@@ -112,9 +115,13 @@ struct app : public vapp {
       vee::update_descriptor_set(dset, 4, img_ngl.iv(), *smp);
       vee::update_descriptor_set(dset, 5, img_rgh.iv(), *smp);
 
-      upc pc { { 5, 5, 5 } };
+      sitime::stopwatch time {};
+      upc pc {};
+      pc.light = { 5, 5, 5 };
       bool loaded = false;
       extent_loop(dq.queue(), sw, [&] {
+        pc.aspect = sw.aspect();
+        pc.time = time.millis() / 1000.0f;
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           if (!loaded) {
             vbuf.setup_copy(*pcb);

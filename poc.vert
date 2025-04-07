@@ -4,6 +4,8 @@
 
 layout(push_constant) uniform upc {
   vec3 light;
+  float aspect;
+  float time;
 };
 
 layout(location = 0) in vec3 pos;
@@ -19,10 +21,10 @@ layout(location = 2) out mat3 f_tbn;
 const float fov_rad = radians(90);
 
 void main() {
-  mat4 proj = projection_matrix(fov_rad, 1, 0.001, 10.0);
+  mat4 proj = projection_matrix(fov_rad, aspect, 0.001, 10.0);
 
   mat4 model_t = translation(vec3(0, 0.25, -2));
-  float a = radians(-45);
+  float a = radians(-45 * sin(time));
   mat4 model_r = mat4(
     1, 0, 0, 0,
     0, cos(a), -sin(a), 0,
