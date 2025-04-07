@@ -117,11 +117,11 @@ struct app : public vapp {
 
       sitime::stopwatch time {};
       upc pc {};
-      pc.light = { 5, 5, 5 };
       bool loaded = false;
       extent_loop(dq.queue(), sw, [&] {
         pc.aspect = sw.aspect();
         pc.time = time.millis() / 1000.0f;
+        pc.light = { static_cast<float>(5.0f * dotz::cos(pc.time * 1.5)), 5.0f, 5.0f };
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           if (!loaded) {
             vbuf.setup_copy(*pcb);
