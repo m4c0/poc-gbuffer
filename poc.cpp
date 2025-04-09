@@ -28,8 +28,8 @@ struct vtx {
   dotz::vec3 pos;
   dotz::vec2 uv;
   dotz::vec3 nrm;
-  dotz::vec3 tgt;
   dotz::vec3 btgt;
+  dotz::vec3 tgt;
 };
 
 static constexpr const auto vtx_count = 12;
@@ -41,32 +41,44 @@ static auto load_cube(vee::physical_device pd) {
     .pos { 1, 1, 1 },
     .uv { 1, 1 },
     .nrm { 0, 0, 1 },
+    .btgt { 0, 1, 0 },
+    .tgt { 1, 0, 0 },
   };
   m += {
     .pos { -1, -1, 1 },
     .uv { 0, 0 },
     .nrm { 0, 0, 1 },
+    .btgt { 0, 1, 0 },
+    .tgt { 1, 0, 0 },
   };
   m += {
     .pos { 1, -1, 1 },
     .uv { 1, 0 },
     .nrm { 0, 0, 1 },
+    .btgt { 0, 1, 0 },
+    .tgt { 1, 0, 0 },
   };
 
   m += {
     .pos { 1, 1, 1 },
     .uv { 1, 1 },
     .nrm { 0, 0, 1 },
+    .btgt { 0, 1, 0 },
+    .tgt { 1, 0, 0 },
   };
   m += {
     .pos { -1, 1, 1 },
     .uv { 0, 1 },
     .nrm { 0, 0, 1 },
+    .btgt { 0, 1, 0 },
+    .tgt { 1, 0, 0 },
   };
   m += {
     .pos { -1, -1, 1 },
     .uv { 0, 0 },
     .nrm { 0, 0, 1 },
+    .btgt { 0, 1, 0 },
+    .tgt { 1, 0, 0 },
   };
   return buf;
 }
@@ -141,7 +153,11 @@ struct app : public vapp {
       extent_loop(dq.queue(), sw, [&] {
         pc.aspect = sw.aspect();
         pc.time = time.millis() / 1000.0f;
-        pc.light = { static_cast<float>(5.0f * dotz::cos(pc.time * 1.5)), 5.0f, 5.0f };
+        pc.light = {
+          0.0f, //static_cast<float>(5.0f * dotz::cos(pc.time * 1.5)),
+          5.0f,
+          0.0f,
+        };
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           if (!loaded) {
             vbuf.setup_copy(*pcb);
