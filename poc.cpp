@@ -43,11 +43,11 @@ static auto load_cube(vee::physical_device pd) {
   };
   m += {
     .pos { -1, -1, 1 },
-    .uv { -1, -1 },
+    .uv { 0, 0 },
   };
   m += {
     .pos { 1, -1, 1 },
-    .uv { 1, -1 },
+    .uv { 1, 0 },
   };
 
   m += {
@@ -56,11 +56,11 @@ static auto load_cube(vee::physical_device pd) {
   };
   m += {
     .pos { -1, 1, 1 },
-    .uv { -1, 1 },
+    .uv { 0, 1 },
   };
   m += {
     .pos { -1, -1, 1 },
-    .uv { -1, -1 },
+    .uv { 0, 0 },
   };
   return buf;
 }
