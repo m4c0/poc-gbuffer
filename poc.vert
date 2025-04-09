@@ -34,10 +34,13 @@ void main() {
   );
   mat4 model = model_r * model_t;
 
-  gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
-  f_pos = pos;
+  vec4 p = vec4(pos, 1) * model;
+  vec4 n = vec4(nrm, 0) * model;
+
+  gl_Position = vec4(1, -1, 1, 1) * p * proj;
+  f_pos = p.xyz;
   f_uv = uv;
-  f_nrm = nrm;
+  f_nrm = normalize(n.xyz);
   // Object-to-tangent
   f_tbn = mat3(tgt, btgt, nrm);
 }
