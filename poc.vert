@@ -23,7 +23,7 @@ const float fov_rad = radians(90);
 void main() {
   mat4 proj = projection_matrix(fov_rad, aspect, 0.001, 10.0);
 
-  mat4 model_t = translation(vec3(0, 0.25, -2));
+  mat4 model_t = translation(vec3(0, 0.25, -5));
   float a = radians(-45 * sin(time));
   mat4 model_r = mat4(
     1, 0, 0, 0,
