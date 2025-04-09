@@ -16,7 +16,8 @@ layout(location = 4) in vec3 btgt;
 
 layout(location = 0) out vec3 f_pos;
 layout(location = 1) out vec2 f_uv;
-layout(location = 2) out mat3 f_tbn;
+layout(location = 2) out vec3 f_nrm;
+layout(location = 3) out mat3 f_tbn;
 
 const float fov_rad = radians(90);
 
@@ -36,6 +37,7 @@ void main() {
   gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * model * proj;
   f_pos = pos;
   f_uv = uv;
+  f_nrm = nrm;
   // Object-to-tangent
   f_tbn = mat3(tgt, btgt, nrm);
 }
