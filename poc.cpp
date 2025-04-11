@@ -69,6 +69,8 @@ struct app : public vapp {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       auto vbuf = load_cube(dq.physical_device());
 
+      auto rp = vee::create_render_pass(dq.physical_device(), dq.surface());
+
       const auto load_image = [&](jute::view name) {
         return voo::load_sires_image(name, dq.physical_device());
       };
@@ -98,7 +100,7 @@ struct app : public vapp {
       });
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
-        .render_pass = dq.render_pass(),
+        .render_pass = *rp,
         .shaders {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
@@ -151,6 +153,9 @@ struct app : public vapp {
 
           auto scb = sw.cmd_render_pass({
             .command_buffer = *pcb,
+            .render_pass = *rp,
+            .framebuffer = sw.framebuffer(),
+            .extent = sw.extent(),
             .clear_colours { vee::clear_colour(0.01, 0.02, 0.03, 1.0) },
           });
           vee::cmd_set_viewport(*pcb, sw.extent());
