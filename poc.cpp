@@ -37,49 +37,22 @@ static auto load_cube(vee::physical_device pd) {
   voo::h2l_buffer buf { pd, sizeof(vtx) * vtx_count };
   voo::memiter<vtx> m { buf.host_memory() };
 
-  m += {
-    .pos { 1, 1, 1 },
-    .uv { 1, 1 },
-    .nrm { 0, 0, 1 },
-    .btgt { 0, 1, 0 },
-    .tgt { 1, 0, 0 },
-  };
-  m += {
-    .pos { -1, -1, 1 },
-    .uv { 0, 0 },
-    .nrm { 0, 0, 1 },
-    .btgt { 0, 1, 0 },
-    .tgt { 1, 0, 0 },
-  };
-  m += {
-    .pos { 1, -1, 1 },
-    .uv { 1, 0 },
-    .nrm { 0, 0, 1 },
-    .btgt { 0, 1, 0 },
-    .tgt { 1, 0, 0 },
-  };
+  m += { .pos {  1,  1, 1 }, .uv { 1, 1 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
+  m += { .pos { -1, -1, 1 }, .uv { 0, 0 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
+  m += { .pos {  1, -1, 1 }, .uv { 1, 0 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
 
-  m += {
-    .pos { 1, 1, 1 },
-    .uv { 1, 1 },
-    .nrm { 0, 0, 1 },
-    .btgt { 0, 1, 0 },
-    .tgt { 1, 0, 0 },
-  };
-  m += {
-    .pos { -1, 1, 1 },
-    .uv { 0, 1 },
-    .nrm { 0, 0, 1 },
-    .btgt { 0, 1, 0 },
-    .tgt { 1, 0, 0 },
-  };
-  m += {
-    .pos { -1, -1, 1 },
-    .uv { 0, 0 },
-    .nrm { 0, 0, 1 },
-    .btgt { 0, 1, 0 },
-    .tgt { 1, 0, 0 },
-  };
+  m += { .pos {  1,  1, 1 }, .uv { 1, 1 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
+  m += { .pos { -1,  1, 1 }, .uv { 0, 1 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
+  m += { .pos { -1, -1, 1 }, .uv { 0, 0 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
+
+  m += { .pos {  1, 1,  1 }, .uv { 1, 1 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
+  m += { .pos {  1, 1, -1 }, .uv { 1, 0 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
+  m += { .pos { -1, 1, -1 }, .uv { 0, 0 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
+                                                                            
+  m += { .pos {  1, 1,  1 }, .uv { 1, 1 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
+  m += { .pos { -1, 1, -1 }, .uv { 0, 0 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
+  m += { .pos { -1, 1,  1 }, .uv { 0, 1 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
+
   return buf;
 }
 
@@ -118,7 +91,6 @@ struct app : public vapp {
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
-        .back_face_cull = false,
         .shaders {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
