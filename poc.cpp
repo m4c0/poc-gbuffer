@@ -191,11 +191,7 @@ struct app : public vapp {
         .pipeline_layout = *pl2,
         .render_pass = *rp,
         .subpass = 1,
-        .blends {
-          vee::colour_blend_none(),
-          vee::colour_blend_none(),
-          vee::colour_blend_none(),
-        },
+        .blends { vee::colour_blend_none() },
         .shaders {
           voo::shader("poc.2.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.2.frag.spv").pipeline_frag_stage(),
@@ -245,6 +241,7 @@ struct app : public vapp {
             .extent = sw.extent(),
             .clear_colours {
               vee::clear_colour(0.01, 0.02, 0.03, 1.0),
+              vee::clear_colour(0, 0, 0, 0),
               vee::clear_colour(0, 0, 0, 0),
               vee::clear_colour(0, 0, 0, 0),
             },
