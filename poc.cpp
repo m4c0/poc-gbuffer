@@ -82,6 +82,11 @@ struct app : public vapp {
       auto rp = vee::create_render_pass({
         .attachments {{
           vee::create_colour_attachment(dq.physical_device(), dq.surface()),
+          vee::create_colour_attachment({
+            .format = VK_FORMAT_R8G8B8A8_SRGB,
+            .store_op = vee::attachment_store_op_dont_care,
+            .final_layout = vee::image_layout_color_attachment_optimal,
+          }),
           vec_att,
           vec_att,
           vee::create_depth_attachment(),
@@ -89,17 +94,20 @@ struct app : public vapp {
         .subpasses {{
           vee::create_subpass({
             .colours {{
-              create_attachment_ref(0, vee::image_layout_color_attachment_optimal),
               create_attachment_ref(1, vee::image_layout_color_attachment_optimal),
               create_attachment_ref(2, vee::image_layout_color_attachment_optimal),
+              create_attachment_ref(3, vee::image_layout_color_attachment_optimal),
             }},
-            .depth_stencil = create_attachment_ref(3, vee::image_layout_depth_stencil_attachment_optimal),
+            .depth_stencil = create_attachment_ref(4, vee::image_layout_depth_stencil_attachment_optimal),
           }),
           vee::create_subpass({
             .colours {{
               create_attachment_ref(0, vee::image_layout_color_attachment_optimal),
-              create_attachment_ref(1, vee::image_layout_color_attachment_optimal),
-              create_attachment_ref(2, vee::image_layout_color_attachment_optimal),
+            }},
+            .inputs {{
+              create_attachment_ref(1, vee::image_layout_read_only_optimal),
+              create_attachment_ref(2, vee::image_layout_read_only_optimal),
+              create_attachment_ref(3, vee::image_layout_read_only_optimal),
             }},
           }),
         }},
@@ -115,9 +123,11 @@ struct app : public vapp {
         }},
       });
 
-      voo::offscreen::colour_buffer pos_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt };
-      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt };
+      voo::offscreen::colour_buffer col_buf { dq.physical_device(), voo::extent_of(dq), VK_FORMAT_R8G8B8A8_SRGB, vee::image_usage_colour_attachment, vee::image_usage_input_attachment };
+      voo::offscreen::colour_buffer pos_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt, vee::image_usage_colour_attachment, vee::image_usage_input_attachment };
+      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt, vee::image_usage_colour_attachment, vee::image_usage_input_attachment };
       voo::swapchain_and_stuff sw { dq, *rp, {{
+        col_buf.image_view(),
         pos_buf.image_view(),
         nrm_buf.image_view(),
       }} };
@@ -172,10 +182,15 @@ struct app : public vapp {
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::btgt)),
         },
       });
-      auto pl2 = vee::create_pipeline_layout();
+
+      auto dsl2 = vee::create_descriptor_set_layout({
+        vee::dsl_fragment_input_attachment(),
+      });
+      auto pl2 = vee::create_pipeline_layout({ *dsl2 });
       auto gp2 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl2,
         .render_pass = *rp,
+        .subpass = 1,
         .blends {
           vee::colour_blend_none(),
           vee::colour_blend_none(),
@@ -190,16 +205,21 @@ struct app : public vapp {
       });
 
       auto smp = vee::create_sampler(vee::linear_sampler);
-      auto dpool = vee::create_descriptor_pool(1, {
+      auto dpool1 = vee::create_descriptor_pool(1, {
         vee::combined_image_sampler(6)
       });
-      auto dset = vee::allocate_descriptor_set(*dpool, *dsl1);
-      vee::update_descriptor_set(dset, 0, img_occ.iv(), *smp);
-      vee::update_descriptor_set(dset, 1, img_clr.iv(), *smp);
-      vee::update_descriptor_set(dset, 2, img_dsp.iv(), *smp);
-      vee::update_descriptor_set(dset, 3, img_ndx.iv(), *smp);
-      vee::update_descriptor_set(dset, 4, img_ngl.iv(), *smp);
-      vee::update_descriptor_set(dset, 5, img_rgh.iv(), *smp);
+      auto dset1 = vee::allocate_descriptor_set(*dpool1, *dsl1);
+      vee::update_descriptor_set(dset1, 0, img_occ.iv(), *smp);
+      vee::update_descriptor_set(dset1, 1, img_clr.iv(), *smp);
+      vee::update_descriptor_set(dset1, 2, img_dsp.iv(), *smp);
+      vee::update_descriptor_set(dset1, 3, img_ndx.iv(), *smp);
+      vee::update_descriptor_set(dset1, 4, img_ngl.iv(), *smp);
+      vee::update_descriptor_set(dset1, 5, img_rgh.iv(), *smp);
+
+      vee::descriptor_pool dpool2 = vee::create_descriptor_pool(1, {
+        vee::input_attachment(),
+      });
+      vee::descriptor_set dset2 = vee::allocate_descriptor_set(*dpool2, *dsl2);
 
       sitime::stopwatch time {};
       upc pc {};
@@ -233,11 +253,12 @@ struct app : public vapp {
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
           vee::cmd_push_vert_frag_constants(*pcb, *pl1, &pc);
-          vee::cmd_bind_descriptor_set(*pcb, *pl1, 0, dset);
+          vee::cmd_bind_descriptor_set(*pcb, *pl1, 0, dset1);
           vee::cmd_bind_gr_pipeline(*pcb, *gp1);
           vee::cmd_draw(*pcb, vtx_count);
           vee::cmd_next_subpass(*pcb);
           vee::cmd_bind_gr_pipeline(*pcb, *gp2);
+          vee::cmd_bind_descriptor_set(*pcb, *pl2, 0, dset2);
           oq.run(*pcb, 0);
         });
       });
