@@ -178,13 +178,16 @@ struct app : public vapp {
             img_rgh.setup_copy(*pcb);
           }
 
-          auto scb = sw.cmd_render_pass({
+          voo::cmd_render_pass rpg {{
             .command_buffer = *pcb,
             .render_pass = *rp,
             .framebuffer = sw.framebuffer(),
             .extent = sw.extent(),
-            .clear_colours { vee::clear_colour(0.01, 0.02, 0.03, 1.0) },
-          });
+            .clear_colours {
+              vee::clear_colour(0.01, 0.02, 0.03, 1.0),
+              vee::clear_colour(0, 0, 0, 0),
+            },
+          }};
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
