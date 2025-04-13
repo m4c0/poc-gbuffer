@@ -71,11 +71,16 @@ struct app : public vapp {
 
       constexpr const auto vec_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
 
+      auto vec_att = vee::create_colour_attachment({
+        .format = vec_fmt,
+        .store_op = vee::attachment_store_op_dont_care,
+        .final_layout = vee::image_layout_color_attachment_optimal,
+      });
       auto rp = vee::create_render_pass({
         .attachments {{
           vee::create_colour_attachment(dq.physical_device(), dq.surface()),
-          vee::create_colour_attachment(vec_fmt, vee::image_layout_color_attachment_optimal),
-          vee::create_colour_attachment(vec_fmt, vee::image_layout_color_attachment_optimal),
+          vec_att,
+          vec_att,
           vee::create_depth_attachment(),
         }},
         .subpasses {{
