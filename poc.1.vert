@@ -3,7 +3,6 @@
 #include "../glslinc/3d.glsl"
 
 layout(push_constant) uniform upc {
-  vec3 light;
   float aspect;
   float time;
 };

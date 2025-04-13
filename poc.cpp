@@ -1,6 +1,6 @@
 #pragma leco app
-#pragma leco add_shader "poc.vert"
-#pragma leco add_shader "poc.frag"
+#pragma leco add_shader "poc.1.vert"
+#pragma leco add_shader "poc.1.frag"
 #pragma leco add_resource "PavingStones138_1K-JPG_AmbientOcclusion.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Color.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Displacement.jpg"
@@ -19,7 +19,6 @@ import vapp;
 import wavefront;
 
 struct upc {
-  dotz::vec3 light;
   float aspect;
   float time;
 };
@@ -155,8 +154,8 @@ struct app : public vapp {
           vee::colour_blend_none(),
         },
         .shaders {
-          voo::shader("poc.vert.spv").pipeline_vert_stage(),
-          voo::shader("poc.frag.spv").pipeline_frag_stage(),
+          voo::shader("poc.1.vert.spv").pipeline_vert_stage(),
+          voo::shader("poc.1.frag.spv").pipeline_frag_stage(),
         },
         .bindings {
           vee::vertex_input_bind(sizeof(vtx)),
@@ -188,11 +187,6 @@ struct app : public vapp {
       extent_loop(dq.queue(), sw, [&] {
         pc.aspect = sw.aspect();
         pc.time = time.millis() / 1000.0f;
-        pc.light = {
-          0.0f, //static_cast<float>(5.0f * dotz::cos(pc.time * 1.5)),
-          5.0f,
-          0.0f,
-        };
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           if (!loaded) {
             vbuf.setup_copy(*pcb);
