@@ -92,10 +92,23 @@ struct app : public vapp {
             }},
             .depth_stencil = create_attachment_ref(3, vee::image_layout_depth_stencil_attachment_optimal),
           }),
+          vee::create_subpass({
+            .colours {{
+              create_attachment_ref(0, vee::image_layout_color_attachment_optimal),
+              create_attachment_ref(1, vee::image_layout_color_attachment_optimal),
+              create_attachment_ref(2, vee::image_layout_color_attachment_optimal),
+            }},
+          }),
         }},
         .dependencies {{
-          vee::create_colour_dependency(),
-          vee::create_depth_dependency(),
+          vee::create_dependency({
+            .src_subpass = 0,
+            .src_stage_mask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            .src_access_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+            .dst_subpass = 1,
+            .dst_stage_mask  = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            .dst_access_mask = VK_ACCESS_SHADER_READ_BIT,
+          }),
         }},
       });
 
@@ -209,6 +222,7 @@ struct app : public vapp {
           vee::cmd_bind_descriptor_set(*pcb, *pl, 0, dset);
           vee::cmd_bind_gr_pipeline(*pcb, *gp);
           vee::cmd_draw(*pcb, vtx_count);
+          vee::cmd_next_subpass(*pcb);
         });
       });
     });
