@@ -214,8 +214,13 @@ struct app : public vapp {
 
       vee::descriptor_pool dpool2 = vee::create_descriptor_pool(1, {
         vee::input_attachment(),
+        vee::input_attachment(),
+        vee::input_attachment(),
       });
       vee::descriptor_set dset2 = vee::allocate_descriptor_set(*dpool2, *dsl2);
+      vee::update_descriptor_set_for_attachment(dset2, 0, col_buf.image_view());
+      vee::update_descriptor_set_for_attachment(dset2, 1, pos_buf.image_view());
+      vee::update_descriptor_set_for_attachment(dset2, 2, nrm_buf.image_view());
 
       sitime::stopwatch time {};
       upc pc {};
