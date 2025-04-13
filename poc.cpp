@@ -185,6 +185,8 @@ struct app : public vapp {
 
       auto dsl2 = vee::create_descriptor_set_layout({
         vee::dsl_fragment_input_attachment(),
+        vee::dsl_fragment_input_attachment(),
+        vee::dsl_fragment_input_attachment(),
       });
       auto pl2 = vee::create_pipeline_layout({ *dsl2 });
       auto gp2 = vee::create_graphics_pipeline({
@@ -213,9 +215,7 @@ struct app : public vapp {
       vee::update_descriptor_set(dset1, 5, img_rgh.iv(), *smp);
 
       vee::descriptor_pool dpool2 = vee::create_descriptor_pool(1, {
-        vee::input_attachment(),
-        vee::input_attachment(),
-        vee::input_attachment(),
+        vee::input_attachment(3)
       });
       vee::descriptor_set dset2 = vee::allocate_descriptor_set(*dpool2, *dsl2);
       vee::update_descriptor_set_for_attachment(dset2, 0, col_buf.image_view());
