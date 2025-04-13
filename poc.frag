@@ -23,6 +23,9 @@ void main() {
   vec3 l = normalize(light - f_pos) * f_tbn;
   vec3 dif = vec3(1) * clamp(dot(n, l), 0, 1);
  
+  // TODO: calculate "normal" and "pos" in a space common with lights
+  // TODO: write "pos" to another buffer
+  // TODO: move light to a second subpass
   colour = vec4(dif, 1.0);
   normal = vec4(n, 0);
 }
