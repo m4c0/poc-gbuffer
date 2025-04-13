@@ -66,17 +66,15 @@ static auto load_cube(vee::physical_device pd) {
 
 struct app : public vapp {
   void run() override {
-    main_loop("poc-voo", [&](auto & dq, auto & sw) {
+    main_loop("poc-voo", [&](auto & dq) {
       auto vbuf = load_cube(dq.physical_device());
 
       constexpr const auto nrm_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
-      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), sw.extent(), nrm_fmt };
-      // TODO: create framebuffers
 
       auto rp = vee::create_render_pass({
         .attachments {{
           vee::create_colour_attachment(dq.physical_device(), dq.surface()),
-          vee::create_colour_attachment(nrm_fmt, vee::image_layout_shader_read_only_optimal),
+          vee::create_colour_attachment(nrm_fmt, vee::image_layout_color_attachment_optimal),
           vee::create_depth_attachment(),
         }},
         .subpasses {{
@@ -93,6 +91,9 @@ struct app : public vapp {
           vee::create_depth_dependency(),
         }},
       });
+
+      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), voo::extent_of(dq), nrm_fmt };
+      voo::swapchain_and_stuff sw { dq, *rp, {{ nrm_buf.image_view() }} };
 
       const auto load_image = [&](jute::view name) {
         return voo::load_sires_image(name, dq.physical_device());
