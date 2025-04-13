@@ -1,6 +1,8 @@
 #pragma leco app
 #pragma leco add_shader "poc.1.vert"
 #pragma leco add_shader "poc.1.frag"
+#pragma leco add_shader "poc.2.vert"
+#pragma leco add_shader "poc.2.frag"
 #pragma leco add_resource "PavingStones138_1K-JPG_AmbientOcclusion.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Color.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Displacement.jpg"
@@ -70,6 +72,8 @@ struct app : public vapp {
 
       constexpr const auto vec_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
 
+      voo::one_quad oq { dq };
+
       auto vec_att = vee::create_colour_attachment({
         .format = vec_fmt,
         .store_op = vee::attachment_store_op_dont_care,
@@ -132,7 +136,7 @@ struct app : public vapp {
       // TODO: setup multiple outputs
       // TODO: setup multiple subpasses
 
-      auto dsl = vee::create_descriptor_set_layout({
+      auto dsl1 = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(),
@@ -140,16 +144,16 @@ struct app : public vapp {
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(),
       });
-      auto pl = vee::create_pipeline_layout({
-        *dsl,
+      auto pl1 = vee::create_pipeline_layout({
+        *dsl1,
       }, {
         vee::vert_frag_push_constant_range<upc>(),
       });
-      auto gp = vee::create_graphics_pipeline({
-        .pipeline_layout = *pl,
+      auto gp1 = vee::create_graphics_pipeline({
+        .pipeline_layout = *pl1,
         .render_pass = *rp,
         .blends {
-          vee::colour_blend_classic(),
+          vee::colour_blend_none(),
           vee::colour_blend_none(),
           vee::colour_blend_none(),
         },
@@ -168,12 +172,28 @@ struct app : public vapp {
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::btgt)),
         },
       });
+      auto pl2 = vee::create_pipeline_layout();
+      auto gp2 = vee::create_graphics_pipeline({
+        .pipeline_layout = *pl2,
+        .render_pass = *rp,
+        .blends {
+          vee::colour_blend_none(),
+          vee::colour_blend_none(),
+          vee::colour_blend_none(),
+        },
+        .shaders {
+          voo::shader("poc.2.vert.spv").pipeline_vert_stage(),
+          voo::shader("poc.2.frag.spv").pipeline_frag_stage(),
+        },
+        .bindings { oq.vertex_input_bind() },
+        .attributes { oq.vertex_attribute(0) },
+      });
 
       auto smp = vee::create_sampler(vee::linear_sampler);
       auto dpool = vee::create_descriptor_pool(1, {
         vee::combined_image_sampler(6)
       });
-      auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
+      auto dset = vee::allocate_descriptor_set(*dpool, *dsl1);
       vee::update_descriptor_set(dset, 0, img_occ.iv(), *smp);
       vee::update_descriptor_set(dset, 1, img_clr.iv(), *smp);
       vee::update_descriptor_set(dset, 2, img_dsp.iv(), *smp);
@@ -212,11 +232,13 @@ struct app : public vapp {
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
-          vee::cmd_push_vert_frag_constants(*pcb, *pl, &pc);
-          vee::cmd_bind_descriptor_set(*pcb, *pl, 0, dset);
-          vee::cmd_bind_gr_pipeline(*pcb, *gp);
+          vee::cmd_push_vert_frag_constants(*pcb, *pl1, &pc);
+          vee::cmd_bind_descriptor_set(*pcb, *pl1, 0, dset);
+          vee::cmd_bind_gr_pipeline(*pcb, *gp1);
           vee::cmd_draw(*pcb, vtx_count);
           vee::cmd_next_subpass(*pcb);
+          vee::cmd_bind_gr_pipeline(*pcb, *gp2);
+          oq.run(*pcb, 0);
         });
       });
     });
