@@ -124,6 +124,10 @@ struct app : public vapp {
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = *rp,
+        .blends {
+          vee::colour_blend_classic(),
+          vee::colour_blend_none(),
+        },
         .shaders {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),

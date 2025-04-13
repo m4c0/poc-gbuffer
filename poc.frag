@@ -16,6 +16,7 @@ layout(location = 1) in vec2 f_uv;
 layout(location = 2) in mat3 f_tbn;
 
 layout(location = 0) out vec4 colour;
+layout(location = 1) out vec4 normal;
 
 void main() {
   vec3 n = texture(ngl, f_uv).rgb * 2.0 - 1.0;
@@ -23,4 +24,5 @@ void main() {
   vec3 dif = vec3(1) * clamp(dot(n, l), 0, 1);
  
   colour = vec4(dif, 1.0);
+  normal = vec4(n, 0);
 }
