@@ -15,17 +15,17 @@ layout(location = 0) in vec3 f_pos;
 layout(location = 1) in vec2 f_uv;
 layout(location = 2) in mat3 f_tbn;
 
-layout(location = 0) out vec4 colour;
-layout(location = 1) out vec4 normal;
+layout(location = 0) out vec4 o_clr;
+layout(location = 1) out vec4 o_pos;
+layout(location = 2) out vec4 o_nrm;
 
 void main() {
   vec3 n = texture(ngl, f_uv).rgb * 2.0 - 1.0;
-  vec3 l = normalize(light - f_pos) * f_tbn;
-  vec3 dif = vec3(1) * clamp(dot(n, l), 0, 1);
+  // vec3 l = normalize(light - f_pos);
+  // vec3 c = texture(clr, f_uv).rgb;
+  // vec3 dif = c * clamp(dot(n, l), 0, 1);
  
-  // TODO: calculate "normal" and "pos" in a space common with lights
-  // TODO: write "pos" to another buffer
-  // TODO: move light to a second subpass
-  colour = vec4(dif, 1.0);
-  normal = vec4(n, 0);
+  o_clr = texture(clr, f_uv);
+  o_pos = vec4(f_pos, 0);
+  o_nrm = vec4(f_tbn * n, 0);
 }

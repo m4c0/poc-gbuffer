@@ -69,12 +69,13 @@ struct app : public vapp {
     main_loop("poc-voo", [&](auto & dq) {
       auto vbuf = load_cube(dq.physical_device());
 
-      constexpr const auto nrm_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
+      constexpr const auto vec_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
 
       auto rp = vee::create_render_pass({
         .attachments {{
           vee::create_colour_attachment(dq.physical_device(), dq.surface()),
-          vee::create_colour_attachment(nrm_fmt, vee::image_layout_color_attachment_optimal),
+          vee::create_colour_attachment(vec_fmt, vee::image_layout_color_attachment_optimal),
+          vee::create_colour_attachment(vec_fmt, vee::image_layout_color_attachment_optimal),
           vee::create_depth_attachment(),
         }},
         .subpasses {{
@@ -82,8 +83,9 @@ struct app : public vapp {
             .colours {{
               create_attachment_ref(0, vee::image_layout_color_attachment_optimal),
               create_attachment_ref(1, vee::image_layout_color_attachment_optimal),
+              create_attachment_ref(2, vee::image_layout_color_attachment_optimal),
             }},
-            .depth_stencil = create_attachment_ref(2, vee::image_layout_depth_stencil_attachment_optimal),
+            .depth_stencil = create_attachment_ref(3, vee::image_layout_depth_stencil_attachment_optimal),
           }),
         }},
         .dependencies {{
@@ -92,8 +94,12 @@ struct app : public vapp {
         }},
       });
 
-      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), voo::extent_of(dq), nrm_fmt };
-      voo::swapchain_and_stuff sw { dq, *rp, {{ nrm_buf.image_view() }} };
+      voo::offscreen::colour_buffer pos_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt };
+      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt };
+      voo::swapchain_and_stuff sw { dq, *rp, {{
+        pos_buf.image_view(),
+        nrm_buf.image_view(),
+      }} };
 
       const auto load_image = [&](jute::view name) {
         return voo::load_sires_image(name, dq.physical_device());
@@ -127,6 +133,7 @@ struct app : public vapp {
         .render_pass = *rp,
         .blends {
           vee::colour_blend_classic(),
+          vee::colour_blend_none(),
           vee::colour_blend_none(),
         },
         .shaders {
@@ -186,6 +193,7 @@ struct app : public vapp {
             .extent = sw.extent(),
             .clear_colours {
               vee::clear_colour(0.01, 0.02, 0.03, 1.0),
+              vee::clear_colour(0, 0, 0, 0),
               vee::clear_colour(0, 0, 0, 0),
             },
           }};
