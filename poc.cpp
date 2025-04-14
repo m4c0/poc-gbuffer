@@ -123,28 +123,15 @@ struct app : public vapp {
         }},
       });
 
-      voo::offscreen::colour_buffer col_buf { dq.physical_device(), voo::extent_of(dq), VK_FORMAT_R8G8B8A8_SRGB, vee::image_usage_colour_attachment, vee::image_usage_input_attachment };
-      voo::offscreen::colour_buffer pos_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt, vee::image_usage_colour_attachment, vee::image_usage_input_attachment };
-      voo::offscreen::colour_buffer nrm_buf { dq.physical_device(), voo::extent_of(dq), vec_fmt, vee::image_usage_colour_attachment, vee::image_usage_input_attachment };
-      voo::swapchain_and_stuff sw { dq, *rp, {{
-        col_buf.image_view(),
-        pos_buf.image_view(),
-        nrm_buf.image_view(),
-      }} };
-
       const auto load_image = [&](jute::view name) {
         return voo::load_sires_image(name, dq.physical_device());
       };
-
       auto img_occ = load_image("PavingStones138_1K-JPG_AmbientOcclusion.jpg");
       auto img_clr = load_image("PavingStones138_1K-JPG_Color.jpg");
       auto img_dsp = load_image("PavingStones138_1K-JPG_Displacement.jpg");
       auto img_ndx = load_image("PavingStones138_1K-JPG_NormalDX.jpg");
       auto img_ngl = load_image("PavingStones138_1K-JPG_NormalGL.jpg");
       auto img_rgh = load_image("PavingStones138_1K-JPG_Roughness.jpg");
-
-      // TODO: setup multiple outputs
-      // TODO: setup multiple subpasses
 
       auto dsl1 = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(),
@@ -154,11 +141,7 @@ struct app : public vapp {
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(),
       });
-      auto pl1 = vee::create_pipeline_layout({
-        *dsl1,
-      }, {
-        vee::vert_frag_push_constant_range<upc>(),
-      });
+      auto pl1 = vee::create_pipeline_layout({ *dsl1 }, { vee::vert_frag_push_constant_range<upc>() });
       auto gp1 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl1,
         .render_pass = *rp,
@@ -183,6 +166,18 @@ struct app : public vapp {
         },
       });
 
+      auto smp = vee::create_sampler(vee::linear_sampler);
+      auto dpool1 = vee::create_descriptor_pool(1, {
+        vee::combined_image_sampler(6)
+      });
+      auto dset1 = vee::allocate_descriptor_set(*dpool1, *dsl1);
+      vee::update_descriptor_set(dset1, 0, img_occ.iv(), *smp);
+      vee::update_descriptor_set(dset1, 1, img_clr.iv(), *smp);
+      vee::update_descriptor_set(dset1, 2, img_dsp.iv(), *smp);
+      vee::update_descriptor_set(dset1, 3, img_ndx.iv(), *smp);
+      vee::update_descriptor_set(dset1, 4, img_ngl.iv(), *smp);
+      vee::update_descriptor_set(dset1, 5, img_rgh.iv(), *smp);
+
       auto dsl2 = vee::create_descriptor_set_layout({
         vee::dsl_fragment_input_attachment(),
         vee::dsl_fragment_input_attachment(),
@@ -202,17 +197,15 @@ struct app : public vapp {
         .attributes { oq.vertex_attribute(0) },
       });
 
-      auto smp = vee::create_sampler(vee::linear_sampler);
-      auto dpool1 = vee::create_descriptor_pool(1, {
-        vee::combined_image_sampler(6)
-      });
-      auto dset1 = vee::allocate_descriptor_set(*dpool1, *dsl1);
-      vee::update_descriptor_set(dset1, 0, img_occ.iv(), *smp);
-      vee::update_descriptor_set(dset1, 1, img_clr.iv(), *smp);
-      vee::update_descriptor_set(dset1, 2, img_dsp.iv(), *smp);
-      vee::update_descriptor_set(dset1, 3, img_ndx.iv(), *smp);
-      vee::update_descriptor_set(dset1, 4, img_ngl.iv(), *smp);
-      vee::update_descriptor_set(dset1, 5, img_rgh.iv(), *smp);
+      const auto create_buffer = [&](auto fmt) {
+        return voo::offscreen::colour_buffer {
+          dq.physical_device(), voo::extent_of(dq), fmt,
+          vee::image_usage_colour_attachment, vee::image_usage_input_attachment
+        };
+      };
+      auto col_buf = create_buffer(VK_FORMAT_R8G8B8A8_SRGB);
+      auto pos_buf = create_buffer(vec_fmt);
+      auto nrm_buf = create_buffer(vec_fmt);
 
       vee::descriptor_pool dpool2 = vee::create_descriptor_pool(1, {
         vee::input_attachment(3)
@@ -221,6 +214,12 @@ struct app : public vapp {
       vee::update_descriptor_set_for_attachment(dset2, 0, col_buf.image_view());
       vee::update_descriptor_set_for_attachment(dset2, 1, pos_buf.image_view());
       vee::update_descriptor_set_for_attachment(dset2, 2, nrm_buf.image_view());
+
+      voo::swapchain_and_stuff sw { dq, *rp, {{
+        col_buf.image_view(),
+        pos_buf.image_view(),
+        nrm_buf.image_view(),
+      }} };
 
       sitime::stopwatch time {};
       upc pc {};
