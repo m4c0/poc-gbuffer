@@ -141,7 +141,10 @@ struct app : public vapp {
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(),
       });
-      auto pl1 = vee::create_pipeline_layout({ *dsl1 }, { vee::vert_frag_push_constant_range<upc>() });
+      auto pl1 = vee::create_pipeline_layout(vee::pipeline_layout_params {
+        {{ *dsl1 }},
+        {{ vee::vert_frag_push_constant_range<upc>() }},
+      });
       auto gp1 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl1,
         .render_pass = *rp,
@@ -183,7 +186,7 @@ struct app : public vapp {
         vee::dsl_fragment_input_attachment(),
         vee::dsl_fragment_input_attachment(),
       });
-      auto pl2 = vee::create_pipeline_layout({ *dsl2 });
+      auto pl2 = vee::create_pipeline_layout({{{ *dsl2 }}});
       auto gp2 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl2,
         .render_pass = *rp,
@@ -199,7 +202,7 @@ struct app : public vapp {
 
       const auto create_buffer = [&](auto fmt) {
         return voo::offscreen::colour_buffer {
-          dq.physical_device(), voo::extent_of(dq), fmt,
+          dq.physical_device(), dq.extent_of(), fmt,
           vee::image_usage_colour_attachment, vee::image_usage_input_attachment
         };
       };
