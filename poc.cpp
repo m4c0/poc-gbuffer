@@ -182,7 +182,10 @@ struct app : public vapp {
         vee::dsl_fragment_input_attachment(),
         vee::dsl_fragment_input_attachment(),
       });
-      auto pl2 = vee::create_pipeline_layout({{{ *dsl2 }}});
+      auto pl2 = vee::create_pipeline_layout({
+        {{ *dsl2 }},
+        {{ vee::vert_frag_push_constant_range<upc>() }},
+      });
       auto gp2 = vee::create_graphics_pipeline({
         .pipeline_layout = *pl2,
         .render_pass = *rp,
@@ -259,6 +262,7 @@ struct app : public vapp {
           vee::cmd_draw(*pcb, v_count);
           vee::cmd_next_subpass(*pcb);
           vee::cmd_bind_gr_pipeline(*pcb, *gp2);
+          vee::cmd_push_vert_frag_constants(*pcb, *pl2, &pc);
           vee::cmd_bind_descriptor_set(*pcb, *pl2, 0, dset2);
           oq.run(*pcb, 0);
         });
