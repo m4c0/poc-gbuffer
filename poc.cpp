@@ -28,10 +28,23 @@ struct upc {
 
 struct tsp {
   dotz::vec3 tgt;
-  dotz::vec3 btgt;
 };
 
 using vtx = wavefront::vtx;
+
+static void load_tangent(vee::device_memory::type t, vee::device_memory::type v, unsigned count) {
+  voo::memiter<vtx> vi { v };
+  voo::memiter<tsp> ti { t };
+  for (auto i = 0; i < count; i += 3) {
+    auto v0 = vi[i + 0].nrm;
+    auto v1 = vi[i + 1].nrm;
+
+    tsp tt {};
+    tt.tgt = dotz::normalise(v1 - v0);
+
+    ti += tt; ti += tt; ti += tt;
+  }
+}
 
 struct app : public vapp {
   void run() override {
@@ -39,6 +52,7 @@ struct app : public vapp {
       auto [v_buf, v_count] = wavefront::load_model(dq.physical_device(), "scene.obj");
 
       voo::host_buffer t_buf { dq.physical_device(), vee::create_vertex_buffer(sizeof(tsp) * v_count) };
+      load_tangent(t_buf.memory(), v_buf.host_memory(), v_count);
 
       constexpr const auto vec_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
 
@@ -136,7 +150,6 @@ struct app : public vapp {
           vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::txt)),
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
           vee::vertex_attribute_vec3(0, traits::offset_of(&tsp::tgt)),
-          vee::vertex_attribute_vec3(0, traits::offset_of(&tsp::btgt)),
         },
       });
 
