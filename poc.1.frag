@@ -16,7 +16,7 @@ layout(location = 1) out vec4 o_pos;
 layout(location = 2) out vec4 o_nrm;
 
 void main() {
-  vec3 n = texture(ngl, f_uv).rgb * 2.0 - 1.0;
+  vec3 n = vec3(0,0,1);//texture(ngl, f_uv).rgb * 2.0 - 1.0;
   // vec3 l = normalize(light - f_pos);
   // vec3 c = texture(clr, f_uv).rgb;
   // vec3 dif = c * clamp(dot(n, l), 0, 1);

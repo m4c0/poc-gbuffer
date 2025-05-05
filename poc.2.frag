@@ -6,12 +6,14 @@ layout(input_attachment_index = 2, set = 0, binding = 2) uniform subpassInput i_
 
 layout(location = 0) out vec4 colour;
 
-const vec3 light = vec3(0, 0, 5);
+const vec3 light = vec3(90, 0, 0);
+const vec3 ambient = vec3(0.02);
 
 void main() {
   vec4 c = subpassLoad(i_clr);
   vec3 p = normalize(light - subpassLoad(i_pos).rgb);
   vec3 n = normalize(subpassLoad(i_nrm).rgb);
-  float l = clamp(dot(p, n), 0, 1);
-  colour = l * c;
+  float l = clamp(dot(n, p), 0, 1);
+  colour = vec4(c.rgb * l + ambient, 1);
+  //colour = vec4(n * 0.5 + 0.5, 1);
 }
