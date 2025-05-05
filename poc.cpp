@@ -22,6 +22,7 @@ import vapp;
 import wavefront;
 
 struct upc {
+  dotz::vec4 cam { 0, 0, -20, 0 };
   float aspect;
   float time;
 };

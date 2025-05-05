@@ -3,6 +3,7 @@
 #include "../glslinc/3d.glsl"
 
 layout(push_constant) uniform upc {
+  vec4 cam;
   float aspect;
   float time;
 };
@@ -20,6 +21,7 @@ layout(location = 2) out mat3 f_tbn;
 const float fov_rad = radians(90);
 
 void main() {
+  mat4 view = view_matrix(cam.xyz, cam.w, vec3(0, 1, 0));
   mat4 proj = projection_matrix(fov_rad, aspect, 0.001, 100.0);
 
   float a = radians(-45 * time);
@@ -31,7 +33,7 @@ void main() {
   );
   vec4 p = vec4(pos, 1) * model;
 
-  gl_Position = vec4(1, -1, 1, 1) * p * proj;
+  gl_Position = vec4(1, -1, 1, 1) * p * view * proj;
   f_pos = p.xyz;
   f_uv = uv;
   f_tbn = mat3(
