@@ -14,14 +14,15 @@ layout(location = 2) in mat3 f_tbn;
 layout(location = 0) out vec4 o_clr;
 layout(location = 1) out vec4 o_pos;
 layout(location = 2) out vec4 o_nrm;
+layout(location = 3) out vec4 o_rox;
 
 void main() {
-  vec3 n = vec3(0,0,1);//texture(ngl, f_uv).rgb * 2.0 - 1.0;
-  // vec3 l = normalize(light - f_pos);
-  // vec3 c = texture(clr, f_uv).rgb;
-  // vec3 dif = c * clamp(dot(n, l), 0, 1);
+  vec3 n = texture(ngl, f_uv).rgb * 2.0 - 1.0;
+  vec4 r = texture(rgh, f_uv);
+  vec4 o = texture(occ, f_uv);
  
   o_clr = texture(clr, f_uv);
   o_pos = vec4(f_pos, 0);
   o_nrm = vec4(f_tbn * n, 0);
+  o_rox = vec4(r.r, o.r, 0, 0);
 }

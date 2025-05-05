@@ -84,6 +84,7 @@ struct app : public vapp {
           }),
           vec_att,
           vec_att,
+          vec_att,
           vee::create_depth_attachment(),
         }},
         .subpasses {{
@@ -92,8 +93,9 @@ struct app : public vapp {
               create_attachment_ref(1, vee::image_layout_color_attachment_optimal),
               create_attachment_ref(2, vee::image_layout_color_attachment_optimal),
               create_attachment_ref(3, vee::image_layout_color_attachment_optimal),
+              create_attachment_ref(4, vee::image_layout_color_attachment_optimal),
             }},
-            .depth_stencil = create_attachment_ref(4, vee::image_layout_depth_stencil_attachment_optimal),
+            .depth_stencil = create_attachment_ref(5, vee::image_layout_depth_stencil_attachment_optimal),
           }),
           vee::create_subpass({
             .colours {{
@@ -103,6 +105,7 @@ struct app : public vapp {
               create_attachment_ref(1, vee::image_layout_read_only_optimal),
               create_attachment_ref(2, vee::image_layout_read_only_optimal),
               create_attachment_ref(3, vee::image_layout_read_only_optimal),
+              create_attachment_ref(4, vee::image_layout_read_only_optimal),
             }},
           }),
         }},
@@ -147,6 +150,7 @@ struct app : public vapp {
           vee::colour_blend_none(),
           vee::colour_blend_none(),
           vee::colour_blend_none(),
+          vee::colour_blend_none(),
         },
         .shaders {
           voo::shader("poc.1.vert.spv").pipeline_vert_stage(),
@@ -181,6 +185,7 @@ struct app : public vapp {
         vee::dsl_fragment_input_attachment(),
         vee::dsl_fragment_input_attachment(),
         vee::dsl_fragment_input_attachment(),
+        vee::dsl_fragment_input_attachment(),
       });
       auto pl2 = vee::create_pipeline_layout({
         {{ *dsl2 }},
@@ -208,19 +213,22 @@ struct app : public vapp {
       auto col_buf = create_buffer(VK_FORMAT_R8G8B8A8_SRGB);
       auto pos_buf = create_buffer(vec_fmt);
       auto nrm_buf = create_buffer(vec_fmt);
+      auto rox_buf = create_buffer(vec_fmt);
 
       vee::descriptor_pool dpool2 = vee::create_descriptor_pool(1, {
-        vee::input_attachment(3)
+        vee::input_attachment(4)
       });
       vee::descriptor_set dset2 = vee::allocate_descriptor_set(*dpool2, *dsl2);
       vee::update_descriptor_set_for_attachment(dset2, 0, col_buf.image_view());
       vee::update_descriptor_set_for_attachment(dset2, 1, pos_buf.image_view());
       vee::update_descriptor_set_for_attachment(dset2, 2, nrm_buf.image_view());
+      vee::update_descriptor_set_for_attachment(dset2, 3, rox_buf.image_view());
 
       voo::swapchain_and_stuff sw { dq, *rp, {{
         col_buf.image_view(),
         pos_buf.image_view(),
         nrm_buf.image_view(),
+        rox_buf.image_view(),
       }} };
 
       sitime::stopwatch time {};
@@ -247,6 +255,7 @@ struct app : public vapp {
             .extent = sw.extent(),
             .clear_colours {
               vee::clear_colour(0.01, 0.02, 0.03, 1.0),
+              vee::clear_colour(0, 0, 0, 0),
               vee::clear_colour(0, 0, 0, 0),
               vee::clear_colour(0, 0, 0, 0),
               vee::clear_colour(0, 0, 0, 0),
