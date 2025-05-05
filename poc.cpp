@@ -38,6 +38,8 @@ struct app : public vapp {
     main_loop("poc-voo", [&](auto & dq) {
       auto [v_buf, v_count] = wavefront::load_model(dq.physical_device(), "scene.obj");
 
+      voo::host_buffer t_buf { dq.physical_device(), vee::create_vertex_buffer(sizeof(tsp) * v_count) };
+
       constexpr const auto vec_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
 
       voo::one_quad oq { dq };
@@ -225,6 +227,7 @@ struct app : public vapp {
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
           vee::cmd_bind_vertex_buffers(*pcb, 0, v_buf.local_buffer());
+          vee::cmd_bind_vertex_buffers(*pcb, 1, t_buf.buffer());
           vee::cmd_push_vert_frag_constants(*pcb, *pl1, &pc);
           vee::cmd_bind_descriptor_set(*pcb, *pl1, 0, dset1);
           vee::cmd_bind_gr_pipeline(*pcb, *gp1);
