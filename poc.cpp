@@ -28,6 +28,7 @@ struct upc {
 
 struct tsp {
   dotz::vec3 tgt;
+  dotz::vec3 btgt;
 };
 
 using vtx = wavefront::vtx;
@@ -36,11 +37,20 @@ static void load_tangent(vee::device_memory::type t, vee::device_memory::type v,
   voo::memiter<vtx> vi { v };
   voo::memiter<tsp> ti { t };
   for (auto i = 0; i < count; i += 3) {
-    auto v0 = vi[i + 0].nrm;
-    auto v1 = vi[i + 1].nrm;
+    auto & v0 = vi[i + 0];
+    auto & v1 = vi[i + 1];
+    auto & v2 = vi[i + 2];
+
+    auto e1 = v1.pos - v0.pos;
+    auto e2 = v2.pos - v0.pos;
+    auto [du1, dv1] = v1.txt - v0.txt;
+    auto [du2, dv2] = v2.txt - v0.txt;
+
+    auto den = du1 * dv2 - du2 * dv1;
 
     tsp tt {};
-    tt.tgt = dotz::normalise(v1 - v0);
+    tt.tgt  = ( dv2 * e1 - dv1 * e2) / den;
+    tt.btgt = (-du2 * e1 + du1 * e2) / den;
 
     ti += tt; ti += tt; ti += tt;
   }
@@ -149,7 +159,8 @@ struct app : public vapp {
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
           vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::txt)),
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
-          vee::vertex_attribute_vec3(0, traits::offset_of(&tsp::tgt)),
+          vee::vertex_attribute_vec3(1, traits::offset_of(&tsp::tgt)),
+          vee::vertex_attribute_vec3(1, traits::offset_of(&tsp::btgt)),
         },
       });
 

@@ -11,6 +11,7 @@ layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 uv;
 layout(location = 2) in vec3 nrm;
 layout(location = 3) in vec3 tgt;
+layout(location = 4) in vec3 btgt;
 
 layout(location = 0) out vec3 f_pos;
 layout(location = 1) out vec2 f_uv;
@@ -29,8 +30,6 @@ void main() {
     0, 0, 0, 1
   );
   vec4 p = vec4(pos, 1) * model;
-
-  vec3 btgt = normalize(cross(nrm, tgt));
 
   gl_Position = vec4(1, -1, 1, 1) * p * proj;
   f_pos = p.xyz;
