@@ -9,6 +9,7 @@
 #pragma leco add_resource "PavingStones138_1K-JPG_NormalDX.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_NormalGL.jpg"
 #pragma leco add_resource "PavingStones138_1K-JPG_Roughness.jpg"
+#pragma leco add_resource "scene.obj"
 
 import dotz;
 import jute;
@@ -25,50 +26,17 @@ struct upc {
   float time;
 };
 
-struct vtx {
-  dotz::vec3 pos;
-  dotz::vec2 uv;
-  dotz::vec3 nrm;
-  dotz::vec3 btgt;
+struct tsp {
   dotz::vec3 tgt;
+  dotz::vec3 btgt;
 };
 
-static constexpr const auto vtx_count = 18;
-static auto load_cube(vee::physical_device pd) {
-  voo::h2l_buffer buf { pd, sizeof(vtx) * vtx_count };
-  voo::memiter<vtx> m { buf.host_memory() };
-
-  m += { .pos {  1,  1, 1 }, .uv { 1, 1 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, -1, 1 }, .uv { 0, 0 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
-  m += { .pos {  1, -1, 1 }, .uv { 1, 0 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
-
-  m += { .pos {  1,  1, 1 }, .uv { 1, 1 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1,  1, 1 }, .uv { 0, 1 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, -1, 1 }, .uv { 0, 0 }, .nrm { 0, 0, 1 }, .btgt { 0, 1, 0 }, .tgt { 1, 0, 0 } };
-
-  m += { .pos {  1, 1,  1 }, .uv { 1, 1 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos {  1, 1, -1 }, .uv { 1, 0 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, 1, -1 }, .uv { 0, 0 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-                                                                            
-  m += { .pos {  1, 1,  1 }, .uv { 1, 1 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, 1, -1 }, .uv { 0, 0 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, 1,  1 }, .uv { 0, 1 }, .nrm { 0, 1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-
-  m += { .pos {  1, -1,  1 }, .uv { 1, 1 }, .nrm { 0, -1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, -1, -1 }, .uv { 0, 0 }, .nrm { 0, -1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos {  1, -1, -1 }, .uv { 1, 0 }, .nrm { 0, -1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-
-  m += { .pos {  1, -1,  1 }, .uv { 1, 1 }, .nrm { 0, -1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, -1,  1 }, .uv { 0, 1 }, .nrm { 0, -1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-  m += { .pos { -1, -1, -1 }, .uv { 0, 0 }, .nrm { 0, -1, 0 }, .btgt { 0, 0, 1 }, .tgt { 1, 0, 0 } };
-
-  return buf;
-}
+using vtx = wavefront::vtx;
 
 struct app : public vapp {
   void run() override {
     main_loop("poc-voo", [&](auto & dq) {
-      auto vbuf = load_cube(dq.physical_device());
+      auto [v_buf, v_count] = wavefront::load_model(dq.physical_device(), "scene.obj");
 
       constexpr const auto vec_fmt = VK_FORMAT_R32G32B32A32_SFLOAT;
 
@@ -159,13 +127,14 @@ struct app : public vapp {
         },
         .bindings {
           vee::vertex_input_bind(sizeof(vtx)),
+          vee::vertex_input_bind(sizeof(tsp)),
         },
         .attributes {
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
-          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),
+          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::txt)),
           vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
-          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::tgt)),
-          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::btgt)),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&tsp::tgt)),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&tsp::btgt)),
         },
       });
 
@@ -232,7 +201,7 @@ struct app : public vapp {
         pc.time = time.millis() / 1000.0f;
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           if (!loaded) {
-            vbuf.setup_copy(*pcb);
+            v_buf.setup_copy(*pcb);
             img_occ.setup_copy(*pcb);
             img_clr.setup_copy(*pcb);
             img_dsp.setup_copy(*pcb);
@@ -255,11 +224,11 @@ struct app : public vapp {
           }};
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
-          vee::cmd_bind_vertex_buffers(*pcb, 0, vbuf.local_buffer());
+          vee::cmd_bind_vertex_buffers(*pcb, 0, v_buf.local_buffer());
           vee::cmd_push_vert_frag_constants(*pcb, *pl1, &pc);
           vee::cmd_bind_descriptor_set(*pcb, *pl1, 0, dset1);
           vee::cmd_bind_gr_pipeline(*pcb, *gp1);
-          vee::cmd_draw(*pcb, vtx_count);
+          vee::cmd_draw(*pcb, v_count);
           vee::cmd_next_subpass(*pcb);
           vee::cmd_bind_gr_pipeline(*pcb, *gp2);
           vee::cmd_bind_descriptor_set(*pcb, *pl2, 0, dset2);

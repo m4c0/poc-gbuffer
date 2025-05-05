@@ -20,18 +20,15 @@ layout(location = 2) out mat3 f_tbn;
 const float fov_rad = radians(90);
 
 void main() {
-  mat4 proj = projection_matrix(fov_rad, aspect, 0.001, 10.0);
+  mat4 proj = projection_matrix(fov_rad, aspect, 0.001, 100.0);
 
-  mat4 model_t = translation(vec3(0, 0.25, -5));
-  float a = radians(-45 * sin(time));
-  mat4 model_r = mat4(
-    1, 0, 0, 0,
-    0, cos(a), -sin(a), 0,
-    0, sin(a), cos(a), 0,
+  float a = radians(-45 * time);
+  mat4 model = mat4(
+    cos(a), 0, -sin(a), 0,
+    0, 1, 0, 0,
+    sin(a), 0, cos(a), 0,
     0, 0, 0, 1
   );
-  mat4 model = model_r * model_t;
-
   vec4 p = vec4(pos, 1) * model;
 
   gl_Position = vec4(1, -1, 1, 1) * p * proj;
